@@ -1,7 +1,7 @@
 Rails Templates
 ===============
 
-Forontend Project
+Frontend Project
 ---------
 * create a project
 <pre>
