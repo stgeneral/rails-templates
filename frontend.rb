@@ -76,6 +76,7 @@ namespace :front do
   desc "Build static application"
   task :build do
     # run "wget -r -k -nH -P build http://localhost:8989; zip -r build.zip build/; rm -R build"
+    sh "rm -fR build"
     sh "wget -r -k -nH -P build http://localhost:8989"
   end
 end
