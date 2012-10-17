@@ -1,7 +1,5 @@
-# rails new front-test --skip-active-record --skip-test-unit -m ~/Code/front/rails_template.rb
 run "rm -R public/index.html app/mailers app/models app/views/layouts/application.html.erb"
 gem "high_voltage"
-#route "match '/*id' => 'high_voltage/pages#show', :as => :page, :format => false"
 route "root :to => 'high_voltage/pages#show', :id => 'home'"
 
 file 'config/environments/build.rb', <<-CODE
