@@ -70,10 +70,6 @@ end
 
 CODE
 
-# initializer 'high_voltage.rb', <<-CODE
-# HighVoltage.routes = false
-# CODE
-
 rakefile("build.rake") do
 <<-TASK
 namespace :front do
