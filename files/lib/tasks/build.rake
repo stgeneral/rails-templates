@@ -25,7 +25,7 @@ namespace :front do
       task :stop do
         pid = File.read(build_server_pid_file).to_i
         Process.kill 9, pid
-        File.delete pid_file
+        File.delete build_server_pid_file
       end
     end
   end
