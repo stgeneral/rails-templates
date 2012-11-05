@@ -7,11 +7,11 @@ Frontend Project
 <pre>
 rails new myapp --skip-active-record --skip-test-unit -m https://raw.github.com/stgeneral/rails-templates/master/frontend.rb
 </pre>
-* start build server
+* sart development server
 <pre>
-rails s -e build -p 8989
+rails s
 </pre>
-* build project
+* build web app
 <pre>
 rake front:build
 </pre>

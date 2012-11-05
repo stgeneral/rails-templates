@@ -2,125 +2,37 @@ run "rm -R public/index.html app/mailers app/models app/views/layouts/applicatio
 gem "high_voltage"
 route "root :to => 'high_voltage/pages#show', :id => 'home'"
 
-file 'config/environments/build.rb', <<-CODE
-#{app_name.titleize}::Application.configure do
-  # Settings specified here will take precedence over those in config/application.rb
+repo = 'https://raw.github.com/stgeneral/rails-templates/master/files/'
+repo = File.dirname(__FILE__) + '/files/' if yes?('Would you like to use local repository?')
 
-  # Code is not reloaded between requests
-  config.cache_classes = true
+files = [{
+    name: 'application.html.erb',
+    path: 'app/views/layouts/'
+  }, {
+    name: 'build.rake',
+    path: 'lib/tasks/'
+  }, {
+    name: 'build.rb',
+    path: 'config/environments/'
+  }, {
+    name: 'home.html.erb',
+    path: 'app/views/pages/'
+  }]
 
-  # Full error reports are disabled and caching is turned on
-  config.consider_all_requests_local       = false
-  config.action_controller.perform_caching = true
-
-  # Disable Rails's static asset server (Apache or nginx will already do this)
-  config.serve_static_assets = false
-
-  # Compress JavaScripts and CSS
-  config.assets.compress = false
-
-  # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = true
-
-  # Generate digests for assets URLs
-  config.assets.digest = false
-
-  # Defaults to nil and saved in location specified by config.assets.prefix
-  # config.assets.manifest = YOUR_PATH
-
-  # Specifies the header that your server uses for sending files
-  # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
-  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
-
-  # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
-
-  # See everything in the log (default is :info)
-  # config.log_level = :debug
-
-  # Prepend all log lines with the following tags
-  # config.log_tags = [ :subdomain, :uuid ]
-
-  # Use a different logger for distributed setups
-  # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
-
-  # Use a different cache store in production
-  # config.cache_store = :mem_cache_store
-
-  # Enable serving of images, stylesheets, and JavaScripts from an asset server
-  # config.action_controller.asset_host = "http://assets.example.com"
-
-  # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  # config.assets.precompile += %w( search.js )
-
-  # Disable delivery errors, bad email addresses will be ignored
-  # config.action_mailer.raise_delivery_errors = false
-
-  # Enable threaded mode
-  # config.threadsafe!
-
-  # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
-  # the I18n.default_locale when a translation can not be found)
-  config.i18n.fallbacks = true
-
-  # Send deprecation notices to registered listeners
-  config.active_support.deprecation = :notify
-
+files.each do |f|
+  get repo + f[:path] + f[:name], f[:path] + f[:name]
+  gsub_file f[:path] + f[:name], /APP_NAME/, "#{app_name.humanize.titleize}"
 end
 
-CODE
-
-rakefile("build.rake") do
-<<-TASK
-namespace :front do
-  desc "Build static application"
-  task :build do
-    # run "wget -r -k -nH -P build http://localhost:8989; zip -r build.zip build/; rm -R build"
-    sh "rm -fR build"
-    sh "wget -r -k -nH -P build http://localhost:8989"
-  end
-end
-TASK
-end
-
-file 'app/views/layouts/application.html.erb', <<-CODE
-<!DOCTYPE html>
-<html>
-<head>
-\t<title>#{app_name.humanize.titleize}</title>
-\t<%= stylesheet_link_tag    "application", :media => "all" %>
-\t<%= javascript_include_tag "jquery" %>
-\t<%= javascript_include_tag "application" %>
-</head>
-<body>
-
-<%= yield %>
-
-<%= render :partial => 'partials/pages' %>
-
-</body>
-</html>
-
-CODE
-
-file 'app/views/pages/home.html.erb', <<-CODE
-<h1>Welcome</h1>
-Find me at app/views/pages/home.html.erb
-CODE
-pages = ask("What pages would you like to generate?")
+pages = ask("What pages would you like to generate (lower case, '_' as word delimiter, ' ' as pages delimiter)?")
 pages_links = ''
 pages.split(' ').each do |page|
-    file "app/views/pages/#{page}.html.erb", <<-CODE
-<h1>#{page.humanize.titleize}</h1>
-Find me at app/views/pages/#{page}.html.erb
-CODE
-pages_links += "\t<li><%= link_to '#{page.humanize.titleize}', page_path('#{page}') %></li>\n"
+  page_file = "app/views/pages/#{page}.html.erb"
+  get repo + "app/views/pages/page.html.erb", page_file
+  gsub_file page_file, /PAGE_TITLE/, page.humanize.titleize
+  gsub_file page_file, /PAGE/, page
+  pages_links += "\t<li><%= link_to '#{page.humanize.titleize}', page_path('#{page}') %></li>\n"
 end
 
-file 'app/views/partials/_pages.html.erb', <<-CODE
-<h3>Pages</h3>
-<ul>
-\t<li><%= link_to 'Home', :root %></li>
-#{pages_links}
-</ul>
-CODE
+get repo + 'app/views/partials/_pages.html.erb', 'app/views/partials/_pages.html.erb'
+gsub_file 'app/views/partials/_pages.html.erb', /PAGES_LINKS/, pages_links
