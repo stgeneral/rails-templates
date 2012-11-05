@@ -1,9 +1,10 @@
-run "rm -R public/index.html app/mailers app/models app/views/layouts/application.html.erb"
 gem "high_voltage"
 route "root :to => 'high_voltage/pages#show', :id => 'home'"
 
+run "rm -R public/index.html app/mailers app/models app/views/layouts/application.html.erb"
+
 repo = 'https://raw.github.com/stgeneral/rails-templates/master/files/'
-repo = File.dirname(__FILE__) + '/files/' if yes?('Would you like to use local repository?')
+repo = File.expand_path(File.dirname(__FILE__) + '/files') + '/' if yes?('Would you like to use local repository?')
 
 files = [{
     name: 'application.html.erb',
